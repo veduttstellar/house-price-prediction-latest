@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>House Price Prediction</title>
+</head>
+<body>
+    <h1>House Price Prediction</h1>
+    <form id="prediction-form">
+        <label for="house_age">Avg. Area House Age:</label>
+        <select id="house_age" name="house_age"></select><br>
+        <label for="rooms">Avg. Area Number of Rooms:</label>
+        <select id="rooms" name="rooms"></select><br>
+        <label for="bedrooms">Avg. Area Number of Bedrooms:</label>
+        <select id="bedrooms" name="bedrooms"></select><br>
+        <label for="city">City:</label>
+        <select id="city" name="city"></select><br>
+        <button type="button" onclick="predictPrice()">Predict</button>
+    </form>
+    <h2 id="result"></h2>
+
+    <script>
+        async function loadUniqueValues() {
+            const response = await fetch('/unique_values');
+            const data = await response.json();
+
+            const houseAgeSelect = document.getElementById('house_age');
+            data.house_ages.forEach(age => {
+                const option = document.createElement('option');
+                option.value = age;
+                option.text = age;
+                houseAgeSelect.appendChild(option);
+            });
+
+            const roomsSelect = document.getElementById('rooms');
+            data.rooms.forEach(room => {
+                const option = document.createElement('option');
+                option.value = room;
+                option.text = room;
+                roomsSelect.appendChild(option);
+            });
+
+            const bedroomsSelect = document.getElementById('bedrooms');
+            data.bedrooms.forEach(bedroom => {
+                const option = document.createElement('option');
+                option.value = bedroom;
+                option.text = bedroom;
+                bedroomsSelect.appendChild(option);
+            });
+
+            const citySelect = document.getElementById('city');
+            data.cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.text = city;
+                citySelect.appendChild(option);
+            });
+        }
+
+        async function predictPrice() {
+            const form = document.getElementById('prediction-form');
+            const data = {
+                house_age: form.house_age.value,
+                rooms: form.rooms.value,
+                bedrooms: form.bedrooms.value,
+                city: form.city.value
+            };
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = 'Predicted Price: ' + result.price;
+        }
+
+        // Load unique values when the page loads
+        window.onload = loadUniqueValues;
+    </script>
+</body>
+</html>
